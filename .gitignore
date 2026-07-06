@@ -1,0 +1,14 @@
+node_modules/
+.next/
+out/
+.env*.local
+.DS_Store
+Thumbs.db
+sessions.json
+node_modules/
+.next/
+out/
+.env*.local
+.DS_Store
+Thumbs.db
+sessions.json
