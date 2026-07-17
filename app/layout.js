@@ -4,8 +4,8 @@ import './globals.css';
 import '../styles/theme.css';
 
 export const metadata = {
-  title: 'Custodia AI – Premium Healthcare Ecosystem',
-  description: 'AI-powered multi-agent healthcare platform for rural India',
+  title: 'Custodia AI',
+  description: 'Rural Healthcare Access Agent Network',
 };
 
 export default function RootLayout({ children }) {
@@ -14,14 +14,12 @@ export default function RootLayout({ children }) {
       <head>
         {/* Google Fonts for Inter */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+        <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js" defer></script>
       </head>
-      <body className="font-sans antialiased bg-white dark:bg-slate-900 transition-colors duration-300">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
-        </ThemeProvider>
-      </body>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }

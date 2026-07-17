@@ -1,14 +1,36 @@
+# Dependencies
 node_modules/
+
+# Build outputs
 .next/
 out/
+dist/
+
+# Environment variables
 .env*.local
+.env
+
+# OS files
 .DS_Store
 Thumbs.db
+
+# Data files
+data/
 sessions.json
-node_modules/
-.next/
-out/
-.env*.local
-.DS_Store
-Thumbs.db
-sessions.json
+
+# Debug
+*.log
+npm-debug.log*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing
+coverage/
+
+# Misc
+*.bak
+*.tmp
