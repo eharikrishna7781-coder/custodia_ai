@@ -89,6 +89,8 @@ export default function Home() {
   const [messages, setMessages] = useState([]);
   const [step, setStep] = useState(0);
   const [sessionId, setSessionId] = useState(null);
+  const [triageData, setTriageData] = useState(null);
+  const [appointmentData, setAppointmentData] = useState(null);
   const [clinics, setClinics] = useState([]);
   const [selectedClinic, setSelectedClinic] = useState(null);
   const [transport, setTransport] = useState(null);
@@ -170,10 +172,22 @@ export default function Home() {
   }, [messages]);
 
   useEffect(() => {
-    if (step === 4 && sessionId) {
+    if (step === 4 && transport) {
       const interval = setInterval(async () => {
         try {
-          const res = await fetch(`/api/tracking/${sessionId}`);
+          const res = await fetch(`/api/tracking/${sessionId || 'anon'}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userLat: userLocation.lat,
+              userLng: userLocation.lng,
+              clinicLat: selectedClinic?.lat,
+              clinicLng: selectedClinic?.lng,
+              etaPickup: transport.eta_pickup,
+              etaDestination: transport.eta_destination,
+              dispatchTime: transport.dispatch_time,
+            }),
+          });
           const data = await res.json();
           if (data.error) return;
           setTrackingData(data);
@@ -193,7 +207,7 @@ export default function Home() {
       }, 3000);
       return () => clearInterval(interval);
     }
-  }, [step, sessionId]);
+  }, [step, sessionId, transport, userLocation, selectedClinic]);
 
   const addMessage = (role, text, type = 'text') => {
     const cleanedText = role === 'bot' ? cleanMarkdownFromText(text) : text;
@@ -264,6 +278,7 @@ export default function Home() {
       }
 
       setSessionId(data.sessionId);
+      if (data.triage) setTriageData({ ...data.triage, symptoms: userMsg });
 
       if (data.triage) {
         addSymptomEntry(userMsg, data.triage);
@@ -320,8 +335,9 @@ export default function Home() {
   const handleClinicSelect = async (clinicId) => {
     setLoading(true);
     setError(null);
-    if (!sessionId) {
-      addMessage('bot', 'Session not found. Please start a new chat.');
+    const clinic = clinics.find(c => c.id === clinicId);
+    if (!clinic) {
+      addMessage('bot', 'Clinic not found. Please try again.');
       setLoading(false);
       return;
     }
@@ -329,14 +345,14 @@ export default function Home() {
       const res = await fetch('/api/appointment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId, clinicId }),
+        body: JSON.stringify({ clinic }),
       });
       const data = await res.json();
       if (data.error) {
         throw new Error(data.error);
       }
-      const clinic = clinics.find(c => c.id === clinicId);
-      setSelectedClinic(clinic);
+      setSelectedClinic({ ...clinic, appointment: data.appointment });
+      setAppointmentData(data.appointment);
       addMessage('bot', `${data.message}\n\nAppointment: ${data.appointment?.time || 'Confirmed'}`);
       goToStep(2);
       addMessage('bot', 'How would you like to get to the clinic?');
@@ -354,7 +370,7 @@ export default function Home() {
       const res = await fetch('/api/transport', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId, choice }),
+        body: JSON.stringify({ choice, lang: selectedLang }),
       });
       const data = await res.json();
       if (data.error) {
@@ -391,7 +407,19 @@ export default function Home() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/report/${sessionId}`);
+      const res = await fetch(`/api/report/${sessionId || 'anon'}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          symptoms: triageData?.symptoms,
+          triage: triageData,
+          clinic: selectedClinic,
+          transport,
+          appointment: appointmentData,
+          lang: selectedLang,
+        }),
+      });
       const data = await res.json();
       if (data.error) {
         throw new Error(data.error);

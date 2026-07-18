@@ -1,12 +1,9 @@
-import { transportAgent, getSession, updateSession } from '@/lib/agents';
+import { transportAgent } from '@/lib/agents';
 
 export async function POST(request) {
   try {
-    const { sessionId, choice } = await request.json();
-    const session = getSession(sessionId);
-    if (!session || !session.clinic) return Response.json({ error: 'No clinic booked' }, { status: 400 });
-    const transport = transportAgent(choice, session.lang || 'en');
-    updateSession(sessionId, { transport });
+    const { choice, lang } = await request.json();
+    const transport = transportAgent(choice, lang || 'en');
     return Response.json(transport);
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });

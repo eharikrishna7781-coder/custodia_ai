@@ -48,25 +48,27 @@ function saveSessionsToDisk() {
   }
 }
 
-// Load sessions on startup
-loadSessionsFromDisk();
+// Load sessions on startup (skipped on serverless / read-only filesystems)
+if (!process.env.VERCEL && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
+  loadSessionsFromDisk();
 
-// Periodic cleanup of old sessions (older than 24 hours)
-setInterval(() => {
-  const now = Date.now();
-  const MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours
-  let cleaned = 0;
-  for (const [id, session] of sessions.entries()) {
-    if (session.createdAt && (now - session.createdAt) > MAX_AGE) {
-      sessions.delete(id);
-      cleaned++;
+  // Periodic cleanup of old sessions (older than 24 hours)
+  setInterval(() => {
+    const now = Date.now();
+    const MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours
+    let cleaned = 0;
+    for (const [id, session] of sessions.entries()) {
+      if (session.createdAt && (now - session.createdAt) > MAX_AGE) {
+        sessions.delete(id);
+        cleaned++;
+      }
     }
-  }
-  if (cleaned > 0) {
-    console.log(`Cleaned up ${cleaned} old sessions`);
-    saveSessionsToDisk();
-  }
-}, 60 * 60 * 1000); // Run every hour
+    if (cleaned > 0) {
+      console.log(`Cleaned up ${cleaned} old sessions`);
+      saveSessionsToDisk();
+    }
+  }, 60 * 60 * 1000); // Run every hour
+}
 
 // Hyderabad area clinics
 const CLINICS = [
@@ -408,6 +410,28 @@ export function getAllSessionIds() {
 
 export function getAllSessions() {
   return Array.from(sessions.values());
+}
+
+export function bookAppointmentStateless(clinic) {
+  const appointmentTime = new Date();
+  appointmentTime.setHours(appointmentTime.getHours() + 2);
+  const timeString = appointmentTime.toLocaleString('en-IN', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+  return {
+    clinic,
+    appointment: {
+      time: timeString,
+      status: 'confirmed',
+      clinic_name: clinic.name,
+      clinic_phone: clinic.phone,
+      clinic_address: clinic.address,
+    },
+  };
 }
 
 export function bookingAgent(sessionId, clinicId) {
