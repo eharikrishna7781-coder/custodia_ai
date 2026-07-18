@@ -270,20 +270,19 @@ export async function triageAgent(symptoms, lang = 'en') {
     }
 
     const parsed = await resp.json();
-    const fallback = triageFallback(symptoms, lang);
 
-    const needsDoctor = parsed.needs_doctor ?? fallback.needsDoctor;
-    const suggestedMedicines = Array.isArray(parsed.suggested_medicines) && parsed.suggested_medicines.length > 0
+    const needsDoctor = parsed.needs_doctor === true;
+    const suggestedMedicines = Array.isArray(parsed.suggested_medicines)
       ? parsed.suggested_medicines
-      : fallback.suggestedMedicines || [];
+      : [];
 
     return {
-      score: parsed.urgency_score ?? fallback.score,
-      advice: cleanMarkdownSymbols(parsed.advice || fallback.advice),
+      score: parsed.urgency_score ?? 3,
+      advice: cleanMarkdownSymbols(parsed.advice || ''),
       needsDoctor,
-      diagnosis: cleanMarkdownSymbols(parsed.diagnosis || fallback.diagnosis || 'Could not determine.'),
+      diagnosis: cleanMarkdownSymbols(parsed.diagnosis || 'Could not determine.'),
       suggestedMedicines,
-      careInstructions: cleanMarkdownSymbols(parsed.care_instructions || fallback.careInstructions || 'Rest and stay hydrated.'),
+      careInstructions: cleanMarkdownSymbols(parsed.care_instructions || 'Rest and stay hydrated.'),
       needsDoctorMsg: needsDoctor
         ? getTranslation(lang, 'triage', 'needsDoctor')
         : getTranslation(lang, 'triage', 'noDoctor'),

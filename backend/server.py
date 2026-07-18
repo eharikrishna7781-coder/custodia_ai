@@ -113,9 +113,17 @@ Return ONLY valid JSON with these EXACT fields (all text in {lang_name}):
 
 Rules:
 - Analyze the EXACT symptoms above. Do not return generic advice.
+- suggested_medicines MUST be disease-appropriate. Do NOT default to Paracetamol/ORS unless the diagnosis actually calls for antipyretics/rehydration. Match the medicine to the condition:
+  * Asthma / wheezing -> bronchodilator inhaler (e.g., Salbutamol / Levosalbutamol) + inhaled corticosteroid if maintenance is relevant.
+  * Allergic reactions / rashes / urticaria -> antihistamines (Cetirizine, Loratadine), topical corticosteroid or Calamine as appropriate.
+  * Bacterial suspicion (only if strongly indicated) -> mention a first-line antibiotic as "prescription" (never OTC).
+  * Diarrhea / dehydration -> ORS +/- Zinc; loperamide only if adult non-bloody.
+  * Acid reflux / gastritis -> antacid / PPI (Pantoprazole/Omeprazole).
+  * Hypertension crisis / stroke signs / suspected MI / severe bleeding / unconscious -> return an EMPTY medicines array; do not suggest self-medication.
+  * Fever/viral illness -> Paracetamol is fine here (only here).
 - needs_doctor MUST be true if urgency_score >= 4 or serious condition suspected.
-- If urgency is 5 (chest pain, severe bleeding, unconscious, breathing failure, stroke signs), advice must direct to call 108 / 112 immediately.
-- suggested_medicines can be empty [] for emergencies where self-medication is unsafe.
+- If urgency is 5 (chest pain, severe bleeding, unconscious, breathing failure, stroke signs), advice must direct to call 108 / 112 immediately AND suggested_medicines should be empty [].
+- For urgency 4 emergencies where a specific rescue medication exists (e.g., asthma attack -> inhaler), you SHOULD list it so the patient can use it while en route to care.
 - Never invent prescription-only drugs for minor symptoms; prefer OTC.
 - Respond in {lang_name}. NO markdown symbols anywhere."""
 
