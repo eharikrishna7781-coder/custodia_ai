@@ -1,10 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import path from 'path';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { generateTriage } from './aiTriage';
 import translations, { getTranslation } from './translations';
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 const sessions = new Map();
 const SESSIONS_DIR = path.join(process.cwd(), 'data');
@@ -250,26 +248,8 @@ function triageFallback(symptoms, lang = 'en') {
 }
 
 export async function triageAgent(symptoms, lang = 'en') {
-  const backendUrl = process.env.INTERNAL_BACKEND_URL || 'http://localhost:8001';
-
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 45000);
-
-    const resp = await fetch(`${backendUrl}/api/triage-ai`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ symptoms, lang }),
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-
-    if (!resp.ok) {
-      console.warn('Triage AI backend returned', resp.status);
-      throw new Error(`AI backend ${resp.status}`);
-    }
-
-    const parsed = await resp.json();
+    const parsed = await generateTriage(symptoms, lang);
 
     const needsDoctor = parsed.needs_doctor === true;
     const suggestedMedicines = Array.isArray(parsed.suggested_medicines)
