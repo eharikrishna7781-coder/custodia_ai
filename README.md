@@ -184,22 +184,6 @@ See `frontend/VERCEL_DEPLOY.md` for the detailed walk-through.
 
 ---
 
-## 11. 👥 Team
-
-| Name | Role |
-|---|---|
-| _Your name_ | Full-stack, AI integration |
-| _Teammate_ | Frontend, UX |
-| _Teammate_ | Data, clinic partnerships |
-
-> _Replace the rows above with your team's names, roles, and GitHub / LinkedIn links._
-
----
-
-## 12. 📄 License
-
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
-
 ---
 
 ### 🙏 Acknowledgements
