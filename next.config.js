@@ -32,11 +32,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-
-  // Experimental features
-  experimental: {
-    serverActions: true,
-  },
 };
 
 module.exports = nextConfig;
