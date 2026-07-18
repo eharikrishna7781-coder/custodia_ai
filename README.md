@@ -42,7 +42,7 @@ Everything runs stateless-first, so the app scales cleanly on serverless platfor
 - 🌐 **Six-language support** with browser-native voice input and text-to-speech.
 - 🚑 **Emergency SOS** with one-tap access to 108, 112, and other Indian helplines.
 - 🖼️ **Vision AI** for analyzing photos of rashes, wounds, and bites (Gemini vision).
-- 📱 **PWA** — installable on Android/iOS, works offline via service worker.
+
 - 🌙 **Dark mode** with system-preference detection.
 - ⏰ **Medicine reminders** with browser notifications and check-off tracking.
 - 📊 **Symptom history** persisted in local storage.
